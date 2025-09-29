@@ -11,7 +11,7 @@ pub fn do_work() -> Result<(), String> {
         &config.server_ip,
         config.server_port,
         config.bandwidth_limit_kbps,
-    );
+    )?;
 
     Ok(())
 }

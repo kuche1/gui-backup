@@ -9,7 +9,7 @@ pub fn rsync(
     server_ip: &str,
     server_port: u16,
     bandwidth_limit_kbps: u32,
-) {
+) -> Result<(), String> {
     let cmd = match Command::new("rsync")
         .args([
             "-av",
@@ -24,18 +24,18 @@ pub fn rsync(
         .output()
     {
         Ok(v) => v,
-        Err(err) => {
-            eprintln!("could not call rsync: {err}");
-            return;
+        Err(e) => {
+            return Err(format!("call to rsync failed: {e}")); // TODO: ugly, 100% there is a better way
         }
     };
 
     if !cmd.status.success() {
-        eprintln!(
-            "rsync failure [{}]:\nvvvvv\n{}\n^^^^^",
+        return Err(format!(
+            "rsync failure [{}]:\n{}",
             cmd.status,
             String::from_utf8_lossy(&cmd.stderr)
-        );
-        return;
-    }
+        ));
+    };
+
+    Ok(())
 }
