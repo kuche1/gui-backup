@@ -18,7 +18,7 @@ impl Config {
 
         let content = fs::read_to_string(&config_path).map_err(|_e| {
             format!(
-                "конфигурационния файл не съществува: {}",
+                "конфигурационният файл не съществува: {}",
                 config_path.display()
             )
         })?;

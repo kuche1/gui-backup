@@ -41,9 +41,9 @@ impl eframe::App for TheGui {
                     .resizable(false)
                     .show(ctx, |ui| {
                         ui.label(error);
-                        if ui.button("close").clicked() {
-                            // self.show_popup = false;
-                        }
+                        // if ui.button("close").clicked() {
+                        //     self.show_popup = false;
+                        // }
                     });
 
                 ui.label("Грешка");
