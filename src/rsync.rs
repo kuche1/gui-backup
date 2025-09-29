@@ -1,6 +1,6 @@
 // use std::path::Path; // TODO: ideally we would use a path
 
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 pub fn rsync(
     local_path: &str,
@@ -10,9 +10,7 @@ pub fn rsync(
     server_port: u16,
     bandwidth_limit_kbps: u32,
 ) -> Result<(), String> {
-    // TODO capturing the output like that is not OK
-
-    let cmd = match Command::new("rsync")
+    let mut child = Command::new("rsync")
         .args([
             "-av",
             "--delete-after",
@@ -23,19 +21,18 @@ pub fn rsync(
             local_path,
             &format!("{server_user}@{server_ip}:{server_path}"),
         ])
-        .output()
-    {
-        Ok(v) => v,
-        Err(e) => {
-            return Err(format!("call to rsync failed: {e}")); // TODO: ugly, 100% there is a better way
-        }
-    };
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .map_err(|e| format!("call to rsync failed: {e}"))?;
 
-    if !cmd.status.success() {
+    let exit_status = child
+        .wait()
+        .map_err(|e| format!("could not wait for rsync: {e}"))?;
+
+    if !exit_status.success() {
         return Err(format!(
-            "rsync failure [{}]:\n{}",
-            cmd.status,
-            String::from_utf8_lossy(&cmd.stderr)
+            "rsync bad exit status (see the terminal output for more info)\n{exit_status}",
         ));
     };
 
