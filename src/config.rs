@@ -16,10 +16,11 @@ impl Config {
         let mut config_path = dirs::config_dir().ok_or("could not find config dir")?;
         config_path.push("gui-backup/config.toml");
 
-        let content = fs::read_to_string(&config_path).map_err(|_e| {
+        let content = fs::read_to_string(&config_path).map_err(|e| {
             format!(
-                "конфигурационният файл не съществува: {}",
-                config_path.display()
+                "не може да бъде прочетен конфигурационният файл: {}\n{}",
+                config_path.display(),
+                e
             )
         })?;
 
