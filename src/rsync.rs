@@ -30,6 +30,7 @@ pub fn rsync(
         .wait()
         .map_err(|e| format!("could not wait for rsync: {e}"))?;
 
+    // TODO: ignore the acceptable reutrn codes
     if !exit_status.success() {
         return Err(format!(
             "rsync bad exit status (see the terminal output for more info)\n{exit_status}",
