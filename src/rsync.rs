@@ -10,6 +10,8 @@ pub fn rsync(
     server_port: u16,
     bandwidth_limit_kbps: u32,
 ) -> Result<(), String> {
+    // TODO capturing the output like that is not OK
+
     let cmd = match Command::new("rsync")
         .args([
             "-av",
