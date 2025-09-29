@@ -23,8 +23,8 @@ impl Config {
             )
         })?;
 
-        let config: Config =
-            toml::from_str(&content).map_err(|_e| "could not parse config file")?;
+        let config: Config = toml::from_str(&content)
+            .map_err(|e| format!("грешен формат на конфигурационния файл:\n{e}"))?;
 
         Ok(config)
     }
