@@ -10,6 +10,7 @@ pub fn rsync(
     server_port: u16,
     bandwidth_limit_kbps: u32,
 ) -> Result<(), String> {
+    // TODO: this DOES NOT DIE if the gui is closed
     let mut child = Command::new("rsync")
         .args([
             "-av",
