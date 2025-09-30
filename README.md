@@ -4,5 +4,5 @@
 TODO
 
 1) kill rsync if gui is closed
-2) bigger font
+2) make window smaller
 ```
