@@ -1,5 +1,8 @@
 // use std::path::Path; // TODO: ideally we would use a path
 
+use libc::{PR_SET_PDEATHSIG, SIGTERM, prctl}; // cargo add libc
+use std::io;
+use std::os::unix::process::CommandExt;
 use std::process::{Command, Stdio};
 
 pub fn rsync(
@@ -10,20 +13,34 @@ pub fn rsync(
     server_port: u16,
     bandwidth_limit_kbps: u32,
 ) -> Result<(), String> {
-    // TODO: this DOES NOT DIE if the gui is closed
-    let mut child = Command::new("rsync")
-        .args([
-            "-av",
-            "--delete-after",
-            "--info=progress2",
-            &format!("--bwlimit={bandwidth_limit_kbps}"),
-            "-e",
-            &format!("ssh -p {server_port}"),
-            local_path,
-            &format!("{server_user}@{server_ip}:{server_path}"),
-        ])
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
+    let mut cmd = Command::new("rsync");
+
+    cmd.args([
+        "-av",
+        "--delete-after",
+        "--info=progress2",
+        &format!("--bwlimit={bandwidth_limit_kbps}"),
+        "-e",
+        &format!("ssh -p {server_port}"),
+        local_path,
+        &format!("{server_user}@{server_ip}:{server_path}"),
+    ]);
+
+    // redirect output to terminal
+    cmd.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+
+    // make the child process terminate if the parent dies
+    unsafe {
+        cmd.pre_exec(|| {
+            let ret = prctl(PR_SET_PDEATHSIG, SIGTERM);
+            if ret != 0 {
+                return Err(io::Error::last_os_error());
+            }
+            Ok(())
+        });
+    };
+
+    let mut child = cmd
         .spawn()
         .map_err(|e| format!("call to rsync failed: {e}"))?;
 

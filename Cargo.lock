@@ -1312,6 +1312,7 @@ dependencies = [
  "dirs",
  "eframe",
  "egui",
+ "libc",
  "serde",
  "toml",
 ]
