@@ -9,7 +9,7 @@ pub fn run_gui() {
     let options = eframe::NativeOptions::default();
 
     eframe::run_native(
-        "GUI Backup",
+        "Синхронизация",
         options,
         Box::new(|_cc| Ok(Box::new(TheGui::new()))),
     )
