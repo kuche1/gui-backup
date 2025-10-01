@@ -5,6 +5,8 @@ use eframe::egui; // cargo add eframe egui
 use std::sync::{Arc, Mutex};
 use std::thread;
 
+const SCALE: f32 = 3.0;
+
 pub fn run_gui() {
     let options = eframe::NativeOptions::default();
 
@@ -27,7 +29,7 @@ impl TheGui {
         ///// set font size
 
         let mut style = (*cc.egui_ctx.style()).clone();
-        let scale = 2.0; // make everything this much times bigger
+        let scale = SCALE; // make everything this much times bigger
 
         for (_text_style, font_id) in style.text_styles.iter_mut() {
             font_id.size *= scale;
@@ -58,7 +60,7 @@ impl eframe::App for TheGui {
                     egui::Window::new("ГРЕШКА")
                         .default_size(available_size)
                         .collapsible(false)
-                        .resizable(true)
+                        .resizable(false)
                         .show(ctx, |ui| {
                             ui.label(egui::RichText::new(error).monospace());
                             // .size(16.0)

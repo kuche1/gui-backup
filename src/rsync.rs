@@ -48,11 +48,20 @@ pub fn rsync(
         .wait()
         .map_err(|e| format!("could not wait for rsync: {e}"))?;
 
-    // TODO: ignore the acceptable reutrn codes - see `man rsync` - `EXIT VALUES` - `0 - Success`
     if !exit_status.success() {
-        return Err(format!(
-            "rsync bad exit status (see the terminal output for more info)\n{exit_status}",
-        ));
+        let code = exit_status
+            .code()
+            .ok_or("rsync process was killed by a signal")?;
+
+        // add any "ok" return codes here
+        // see `man rsync` - `EXIT VALUES` - `0 - Success`
+
+        if code == 24 {
+            // 24 - Partial transfer due to vanished source files
+            return Ok(());
+        }
+
+        return Err(format!("rsync грешка # {code}"));
     };
 
     Ok(())
